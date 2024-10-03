@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+    <ModulePrefs title="Filter Ticket Count"
+                 description="Displays the number of tickets based on a filter query"
+                 author="Theodorus van der Sluijs"
+                 author_email="t.vandersluijs@maxxton.com"
+                 width="100%"/>
+
+    <UserPref name="filterId" display_name="Filter ID" required="true"/>
+
+    <Content type="html">
+        <![CDATA[
+            <div>
+                <h2>Ticket Count for Filter</h2>
+                <div id="ticket-count">
+                    <strong>Loading ticket count...</strong>
+                </div>
+            </div>
+
+            <script type="text/javascript">
+                // Grab the filter ID from user input
+                var filterId = gadgets.util.unescapeString(__PARAMS__.filterId);
+                
+                // Jira REST API URL
+                var jiraApiUrl = "/rest/api/2/search?jql=filter=" + filterId;
+
+                // Make a REST API call to get the number of issues for the given filter
+                jQuery.ajax({
+                    url: jiraApiUrl,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        var ticketCount = data.total;
+                        var filterUrl = "/secure/FilterView.jspa?filter=" + filterId; // URL to view the filter
+                        jQuery('#ticket-count').html('<a href="' + filterUrl + '" target="_blank" class="tile">Number of tickets: ' + ticketCount + '</a>');
+                    },
+                    error: function(xhr, status, error) {
+                        jQuery('#ticket-count').html('<div class="tile">Error: Unable to fetch data</div>');
+                    }
+                });
+            </script>
+        ]]>
+    </Content>
+</Module>
+    
